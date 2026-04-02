@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Placement Preparation Tracker</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            color: #333;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        /* ── Add Topic Form ── */
+        .form-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px 24px;
+            max-width: 500px;
+            margin: 0 auto 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .form-card h2 { margin-bottom: 14px; font-size: 1.1rem; color: #555; }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-row input[type="text"] {
+            flex: 1;
+            padding: 9px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.95rem;
+        }
+
+        .form-row input[type="text"]:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn-add {
+            padding: 9px 18px;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .btn-add:hover { background: #2980b9; }
+
+        .error-msg {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+
+        /* ── Topics Table ── */
+        .table-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px 24px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .table-card h2 { margin-bottom: 14px; font-size: 1.1rem; color: #555; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.93rem;
+        }
+
+        th { background: #f7f9fb; color: #666; font-weight: 600; }
+
+        tr:last-child td { border-bottom: none; }
+
+        /* Status badge */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-done   { background: #d4edda; color: #155724; }
+        .badge-pending { background: #fff3cd; color: #856404; }
+
+        /* Action buttons */
+        .btn-complete {
+            padding: 5px 12px;
+            background: #27ae60;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            text-decoration: none;
+        }
+
+        .btn-complete:hover { background: #219150; }
+
+        .btn-delete {
+            padding: 5px 12px;
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            text-decoration: none;
+            margin-left: 6px;
+        }
+
+        .btn-delete:hover { background: #c0392b; }
+
+        .no-topics { text-align: center; color: #999; padding: 20px 0; }
+    </style>
+</head>
+<body>
+
+<h1>📚 Placement Preparation Tracker</h1>
+
+<!-- ── Add Topic Form ── -->
+<div class="form-card">
+    <h2>Add New Topic</h2>
+    <form th:action="@{/add}" th:object="${newTopic}" method="post">
+        <div class="form-row">
+            <input type="text"
+                   th:field="*{topicName}"
+                   placeholder="e.g. Arrays, Dynamic Programming..."
+                   autocomplete="off"/>
+            <button type="submit" class="btn-add">Add</button>
+        </div>
+        <!-- Validation error message -->
+        <p class="error-msg" th:if="${#fields.hasErrors('topicName')}"
+           th:errors="*{topicName}"></p>
+    </form>
+</div>
+
+<!-- ── Topics Table ── -->
+<div class="table-card">
+    <h2>All Topics</h2>
+
+    <div class="no-topics" th:if="${#lists.isEmpty(topics)}">
+        No topics yet. Add one above!
+    </div>
+
+    <table th:if="${!#lists.isEmpty(topics)}">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Topic Name</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="topic, stat : ${topics}">
+                <td th:text="${stat.count}">1</td>
+                <td th:text="${topic.topicName}">Topic</td>
+                <td>
+                    <span class="badge badge-done"
+                          th:if="${topic.status == 'Completed'}">Completed</span>
+                    <span class="badge badge-pending"
+                          th:unless="${topic.status == 'Completed'}">Not Completed</span>
+                </td>
+                <td>
+                    <!-- Show "Complete" button only if not already completed -->
+                    <a th:unless="${topic.status == 'Completed'}"
+                       th:href="@{/complete/{id}(id=${topic.id})}"
+                       class="btn-complete">✔ Complete</a>
+
+                    <a th:href="@{/delete/{id}(id=${topic.id})}"
+                       class="btn-delete"
+                       onclick="return confirm('Delete this topic?')">✖ Delete</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
