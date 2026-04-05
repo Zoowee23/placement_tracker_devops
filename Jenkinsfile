@@ -2,15 +2,16 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven3'
-        jdk 'JDK17'
+        maven 'Maven'
+        jdk 'JDK'
     }
 
     stages {
 
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/advika-khorgade/placement_tracker_devops.git'
+                git branch: 'main',
+                url: 'https://github.com/advika-khorgade/placement_tracker_devops.git'
             }
         }
 
