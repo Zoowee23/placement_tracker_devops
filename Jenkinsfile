@@ -1,4 +1,5 @@
 pipeline {
+
     agent any
 
     tools {
@@ -6,34 +7,41 @@ pipeline {
         jdk 'JDK17'
     }
 
+
     stages {
 
-        stage('Clone Repository') {
+        stage('Pull Code') {
             steps {
                 git branch: 'main',
-                url: 'https://github.com/advika-khorgade/placement_tracker_devops.git'
+                url: 'https://github.com/Zoowee23/placement_tracker_devops.git'
             }
         }
 
-        stage('Build') {
+        stage('Build Project') {
             steps {
                 bat 'mvn clean package'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Execute Tests') {
             steps {
-                bat 'docker build -t placement-tracker .'
+                bat 'mvn test'
             }
         }
 
-        stage('Deploy Container') {
+        stage('Docker Build') {
+            steps {
+               bat 'docker build -t placement-tracker .'
+            }
+        }
+
+        stage('Deploy App') {
             steps {
                 bat 'docker stop placement-container || exit 0'
                 bat 'docker rm placement-container || exit 0'
                 bat 'docker run -d -p 9090:8080 --name placement-container placement-tracker'
+
             }
         }
-
     }
 }
