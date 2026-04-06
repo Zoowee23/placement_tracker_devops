@@ -27,10 +27,16 @@ pipeline {
             }
         }
 
+        stage('Verify JAR') {
+            steps {
+                bat 'dir target'
+            }
+        }
+
         stage('Start App for Testing') {
             steps {
-                bat 'start /B java -jar target/placement-tracker-0.0.1-SNAPSHOT.jar'
-                bat 'timeout /t 15'
+                bat 'start /B java -jar target/*.jar'
+                bat 'ping 127.0.0.1 -n 15 > nul'
             }
         }
 
