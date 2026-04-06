@@ -1,14 +1,9 @@
-# Use official Java 17 image
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:17-jdk-jammy
 
-# Set working directory
-WORKDIR /app
+WORKDIR /opt/tracker_service
 
-# Copy jar file into container
 COPY target/placement-tracker-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose application port
-EXPOSE 8080
+EXPOSE 8085
 
-# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]

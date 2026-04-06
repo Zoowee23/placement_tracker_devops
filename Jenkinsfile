@@ -7,40 +7,43 @@ pipeline {
         jdk 'JDK17'
     }
 
+    environment {
+        IMAGE_NAME = "tracker-image-v2"
+        CONTAINER_NAME = "tracker-container-v2"
+    }
 
     stages {
 
-        stage('Pull Code') {
+        stage('Fetch Code') {
             steps {
                 git branch: 'main',
                 url: 'https://github.com/Zoowee23/placement_tracker_devops.git'
             }
         }
 
-        stage('Build Project') {
+        stage('Build Application') {
             steps {
                 bat 'mvn clean package'
             }
         }
 
-        stage('Execute Tests') {
+        stage('Run Tests') {
             steps {
                 bat 'mvn test'
             }
         }
 
-        stage('Docker Build') {
+        stage('Build Docker Image') {
             steps {
-               bat 'docker build -t placement-tracker .'
+                bat "docker build -t %IMAGE_NAME% ."
             }
         }
 
-        stage('Deploy App') {
+        stage('Deploy Container') {
             steps {
-                bat 'docker stop placement-container || exit 0'
-                bat 'docker rm placement-container || exit 0'
-                bat 'docker run -d -p 9090:8080 --name placement-container placement-tracker'
-
+                bat "docker stop %CONTAINER_NAME% || exit 0"
+                bat "docker rm %CONTAINER_NAME% || exit 0"
+                bat "docker run -d -p 6060:8090 --name %CONTAINER_NAME% %IMAGE_NAME%"
             }
         }
     }

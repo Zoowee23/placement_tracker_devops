@@ -11,22 +11,26 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.5</version>
         <relativePath/>
     </parent>
 
     <!-- Project Details -->
     <groupId>com.tracker</groupId>
     <artifactId>placement-tracker</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>placement-tracker</name>
-    <description>Placement Preparation Tracker</description>
+    <version>0.0.2-SNAPSHOT</version>
+    <name>placement-tracker-v2</name>
+    <description>Placement Tracker DevOps Enhanced</description>
 
     <properties>
         <java.version>17</java.version>
     </properties>
 
     <dependencies>
+
+        <!-- ========================= -->
+        <!-- MAIN APP DEPENDENCIES -->
+        <!-- ========================= -->
 
         <!-- Spring Web -->
         <dependency>
@@ -67,15 +71,15 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.18.1</version>
+            <version>4.20.0</version>
             <scope>test</scope>
         </dependency>
 
-        <!-- WebDriver Manager -->
+        <!-- WebDriver Manager (AUTO driver download) -->
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
-            <version>5.7.0</version>
+            <version>5.8.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -86,7 +90,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- JUnit 5 -->
+        <!-- JUnit 5 (Already included but explicit for clarity) -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -105,11 +109,15 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <!-- JUnit Test Runner -->
+            <!-- Maven Surefire Plugin (RUN TESTS PROPERLY) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
+
+                <configuration>
+                    <useSystemClassLoader>false</useSystemClassLoader>
+                </configuration>
             </plugin>
 
         </plugins>
