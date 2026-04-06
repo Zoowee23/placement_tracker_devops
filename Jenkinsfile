@@ -8,8 +8,8 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = "tracker-image-v2"
-        CONTAINER_NAME = "tracker-container-v2"
+        IMAGE_NAME = "tracker-image-v3"
+        CONTAINER_NAME = "tracker-container-v3"
     }
 
     stages {
@@ -23,19 +23,22 @@ pipeline {
 
         stage('Build Application') {
             steps {
-                bat 'mvn clean package -DskipTests'
+                bat 'mvn clean install -DskipTests'
             }
         }
 
-        stage('Verify JAR') {
+        stage('Verify JAR Exists') {
             steps {
                 bat 'dir target'
             }
         }
 
-        stage('Start App for Testing') {
+        stage('Start App for Selenium Testing') {
             steps {
+                // start app in background
                 bat 'start /B java -jar target/*.jar'
+
+                // wait for app to start
                 bat 'ping 127.0.0.1 -n 15 > nul'
             }
         }
@@ -48,16 +51,28 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t %IMAGE_NAME% ."
+                bat 'docker build --no-cache -t %IMAGE_NAME% .'
             }
         }
 
         stage('Deploy Container') {
             steps {
-                bat "docker stop %CONTAINER_NAME% || exit 0"
-                bat "docker rm %CONTAINER_NAME% || exit 0"
-                bat "docker run -d -p 6060:8090 --name %CONTAINER_NAME% %IMAGE_NAME%"
+                bat 'docker stop %CONTAINER_NAME% || exit 0'
+                bat 'docker rm %CONTAINER_NAME% || exit 0'
+                bat 'docker run -d -p 6060:8090 --name %CONTAINER_NAME% %IMAGE_NAME%'
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline execution completed'
+        }
+        success {
+            echo 'SUCCESS: Application deployed successfully 🚀'
+        }
+        failure {
+            echo 'FAILURE: Check logs for debugging ❌'
         }
     }
 }
