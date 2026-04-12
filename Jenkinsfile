@@ -33,15 +33,17 @@ pipeline {
             }
         }
 
-        stage('Start App for Selenium Testing') {
-            steps {
-                // start app in background
-                bat 'start /B java -jar target/*.jar'
+       stage('Start App for Selenium Testing') {
+    steps {
+        bat '''
+        for %%i in (target\\*.jar) do (
+            start "" java -jar %%i
+        )
+        '''
 
-                // wait for app to start
-                bat 'ping 127.0.0.1 -n 15 > nul'
-            }
-        }
+        bat 'timeout /t 15 /nobreak'
+    }
+}
 
         stage('Run Selenium Tests') {
             steps {
